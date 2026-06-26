@@ -113,8 +113,8 @@ function Nav() {
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <a href="#top" className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-accent)] text-primary-foreground shadow-[var(--shadow-glow)]">
-            <Cloud className="h-5 w-5" />
+          <div className="h-9 w-9 overflow-hidden rounded-xl border border-white/10 bg-slate-950/40">
+            <img src="/logo.png" alt="KORVA" className="h-full w-full object-cover" />
           </div>
           <div className="font-display text-base font-extrabold tracking-tight">KORVA</div>
           <span className="hidden text-xs font-medium text-muted-foreground md:inline">Workforce Cloud</span>
@@ -150,6 +150,12 @@ function Hero() {
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background" />
       <div className="relative mx-auto max-w-7xl px-6 pb-24 pt-20 md:pt-28">
         <div className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto mb-8 flex justify-center">
+            <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-slate-950/20 shadow-[0_20px_50px_rgba(223,172,108,0.15)] transition-transform hover:scale-[1.02] max-w-[200px] md:max-w-[240px]">
+              <img src="/logo.png" alt="KORVA Logo" className="w-full h-auto object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
+            </div>
+          </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur">
             <span className="h-2 w-2 animate-pulse rounded-full bg-primary shadow-[0_0_12px_currentColor]" />
             Discovery + Prototype MVP
@@ -804,7 +810,9 @@ function Footer() {
         <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
           <div>
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-[image:var(--gradient-hero)] text-white shadow-[var(--shadow-elegant)]"><Cloud className="h-5 w-5" /></div>
+              <div className="h-10 w-10 overflow-hidden rounded-xl border border-white/10 bg-slate-950/40">
+                <img src="/logo.png" alt="KORVA" className="h-full w-full object-cover" />
+              </div>
               <div>
                 <div className="font-display text-lg font-bold text-white">KORVA Workforce Cloud</div>
                 <div className="text-xs text-white/60">Discovery & Prototype MVP</div>
