@@ -101,18 +101,16 @@ function SectionHeader({ eyebrow, title, desc }: { eyebrow: string; title: strin
 function Nav() {
   const items = [
     ["lifecycle", "Workflow"],
-    ["demand", "Demand"],
-    ["learner", "Learners"],
-    ["talent", "Talent"],
-    ["workcloud", "WorkCloud"],
-    ["pay", "Pay"],
-    ["analytics", "Analytics"],
-    ["admin", "Admin"],
+    ["components", "Components"],
+    ["journeys", "Journeys"],
+    ["gates", "Gates"],
+    ["roadmap", "Roadmap"],
+    ["metrics", "Metrics"],
   ];
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <a href="#top" className="flex items-center gap-2.5">
+        <a href="#top" className="flex items-center gap-2.5 cursor-pointer">
           <div className="h-9 w-9 overflow-hidden rounded-xl border border-white/10 bg-slate-950/40">
             <img src="/logo.png" alt="KORVA" className="h-full w-full object-cover" />
           </div>
@@ -121,14 +119,14 @@ function Nav() {
         </a>
         <nav className="hidden items-center gap-1 lg:flex">
           {items.map(([id, label]) => (
-            <a key={id} href={`#${id}`} className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+            <a key={id} href={`#${id}`} className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground cursor-pointer">
               {label}
             </a>
           ))}
         </nav>
         <div className="flex items-center gap-2">
           <span className="hidden rounded-full border border-[color:var(--gold)]/30 bg-[color:var(--gold)]/10 px-2.5 py-1 text-xs font-medium text-[color:var(--gold)] md:inline">MVP Prototype</span>
-          <a href="#admin" className="rounded-lg bg-[image:var(--gradient-accent)] px-3.5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02]">Launch</a>
+          <a href="#lifecycle" className="rounded-lg bg-[image:var(--gradient-accent)] px-3.5 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02] cursor-pointer">Launch</a>
         </div>
       </div>
     </header>
@@ -338,11 +336,11 @@ function Lifecycle() {
                     disabled={!isSelectable}
                     className={`relative z-10 grid h-12 w-12 place-items-center rounded-xl border transition-all duration-300 ${
                       isActive 
-                        ? 'border-primary bg-primary/20 text-primary shadow-[var(--shadow-glow)] scale-110' 
+                        ? 'border-primary bg-primary/20 text-primary shadow-[var(--shadow-glow)] scale-110 cursor-pointer' 
                         : isCompleted
-                          ? 'border-primary/60 bg-slate-900/80 text-primary hover:border-primary'
+                          ? 'border-primary/60 bg-slate-900/80 text-primary hover:border-primary cursor-pointer'
                           : isSelectable
-                            ? 'border-white/20 bg-slate-950/60 text-white/70 hover:border-white/40 hover:text-white'
+                            ? 'border-white/20 bg-slate-950/60 text-white/70 hover:border-white/40 hover:text-white cursor-pointer'
                             : 'border-white/5 bg-slate-950/20 text-white/20 cursor-not-allowed'
                     }`}
                   >
@@ -555,7 +553,7 @@ function Lifecycle() {
                   <div className="pt-4">
                     <button
                       onClick={() => handleNextStep(1, 2)}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02]"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02] cursor-pointer"
                     >
                       Submit Demand Request <Zap className="h-4 w-4" />
                     </button>
@@ -607,13 +605,13 @@ function Lifecycle() {
                   <div className="pt-2 flex gap-3">
                     <button 
                       onClick={() => setCurrentStep(1)}
-                      className="flex-1 rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-xs font-semibold text-white/80 hover:bg-slate-950 hover:text-white"
+                      className="flex-1 rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-xs font-semibold text-white/80 hover:bg-slate-950 hover:text-white cursor-pointer"
                     >
                       Request Changes
                     </button>
                     <button
                       onClick={() => handleNextStep(2, 3)}
-                      className="flex-[2] inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                      className="flex-[2] inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02] cursor-pointer"
                     >
                       Approve & Generate Proposal
                     </button>
@@ -662,7 +660,7 @@ function Lifecycle() {
                   <div className="pt-2 flex gap-3">
                     <button 
                       onClick={() => handleNextStep(3, 4)}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02] cursor-pointer"
                     >
                       Authorize Cohort & Begin Training
                     </button>
@@ -710,14 +708,14 @@ function Lifecycle() {
                       <button
                         onClick={startLearningSimulation}
                         disabled={isSimulatingLearning}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all cursor-pointer disabled:cursor-not-allowed"
                       >
                         {isSimulatingLearning ? "Simulating Course..." : "Run Learning Course Simulation"}
                       </button>
                     ) : (
                       <button
                         onClick={() => handleNextStep(4, 5)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02] cursor-pointer"
                       >
                         Onboard Cohort to Assessment Engine
                       </button>
@@ -767,14 +765,14 @@ function Lifecycle() {
                     {!assessmentGraded ? (
                       <button
                         onClick={() => setAssessmentGraded(true)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all cursor-pointer"
                       >
                         Grade Candidate Assessments
                       </button>
                     ) : (
                       <button
                         onClick={() => handleNextStep(5, 6)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02] cursor-pointer"
                       >
                         Issue QR-Certificates & Deploy to WorkCloud
                       </button>
@@ -818,14 +816,14 @@ function Lifecycle() {
                     {!tasksGenerated ? (
                       <button
                         onClick={() => setTasksGenerated(true)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all cursor-pointer"
                       >
                         Generate & Assign Daily Tasks
                       </button>
                     ) : (
                       <button
                         onClick={() => handleNextStep(6, 7)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02] cursor-pointer"
                       >
                         Submit Completed Deliverables for QA Review
                       </button>
@@ -856,7 +854,7 @@ function Lifecycle() {
                         <div className="flex gap-1.5">
                           <button
                             onClick={() => setQaDecisions(prev => ({ ...prev, [t.id]: 'Approved' }))}
-                            className={`rounded px-2.5 py-0.5 text-[10px] font-semibold border transition-all ${
+                            className={`rounded px-2.5 py-0.5 text-[10px] font-semibold border transition-all cursor-pointer ${
                               qaDecisions[t.id] !== 'Rework'
                                 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' 
                                 : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'
@@ -866,7 +864,7 @@ function Lifecycle() {
                           </button>
                           <button
                             onClick={() => setQaDecisions(prev => ({ ...prev, [t.id]: 'Rework' }))}
-                            className={`rounded px-2.5 py-0.5 text-[10px] font-semibold border transition-all ${
+                            className={`rounded px-2.5 py-0.5 text-[10px] font-semibold border transition-all cursor-pointer ${
                               qaDecisions[t.id] === 'Rework'
                                 ? 'bg-rose-500/20 text-rose-400 border-rose-500/40' 
                                 : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'
@@ -882,7 +880,7 @@ function Lifecycle() {
                   <div className="pt-2">
                     <button
                       onClick={() => handleNextStep(7, 8)}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02] cursor-pointer"
                     >
                       Submit Decisions & Authorize Payout Ledger
                     </button>
@@ -930,7 +928,7 @@ function Lifecycle() {
                           setPayoutStatus('Processing');
                           setTimeout(() => setPayoutStatus('Completed'), 1500);
                         }}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02] cursor-pointer"
                       >
                         Release Batch Payouts via API
                       </button>
@@ -941,7 +939,7 @@ function Lifecycle() {
                     ) : (
                       <button
                         onClick={() => handleNextStep(8, 9)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-xs font-semibold text-slate-950 hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform hover:scale-[1.02]"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-xs font-semibold text-slate-950 hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform hover:scale-[1.02] cursor-pointer"
                       >
                         Payouts Complete. View Final Impact Report
                       </button>
@@ -961,7 +959,7 @@ function Lifecycle() {
                       <button
                         key={tab}
                         onClick={() => setImpactTab(tab as any)}
-                        className={`rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all ${
+                        className={`rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                           impactTab === tab 
                             ? 'bg-primary text-primary-foreground' 
                             : 'text-white/60 hover:bg-white/5'
@@ -1053,7 +1051,7 @@ function Lifecycle() {
                   <div className="pt-2">
                     <button
                       onClick={handleRestart}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary transition-all"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary transition-all cursor-pointer"
                     >
                       Restart Operating Loop Simulator
                     </button>
@@ -1256,7 +1254,7 @@ function UserJourneys() {
             <button
               key={key}
               onClick={() => setActiveTab(key as any)}
-              className={`px-6 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 ${
+              className={`px-6 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeTab === key 
                   ? "border-primary bg-primary/20 text-primary shadow-[var(--shadow-glow)]" 
                   : "border-white/10 bg-slate-950/40 text-white/60 hover:text-white hover:border-white/20"
