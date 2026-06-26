@@ -186,614 +186,1410 @@ function Hero() {
   );
 }
 
-// ---------- Lifecycle ----------
-const lifecycle = [
-  { icon: Briefcase, label: "Demand Intake", color: "from-blue-500 to-indigo-500" },
-  { icon: CheckCircle2, label: "Commercial Approval", color: "from-indigo-500 to-violet-500" },
-  { icon: UserCheck, label: "Learner Onboarding", color: "from-violet-500 to-purple-500" },
-  { icon: GraduationCap, label: "Learning", color: "from-purple-500 to-fuchsia-500" },
-  { icon: ClipboardCheck, label: "Assessment", color: "from-fuchsia-500 to-pink-500" },
-  { icon: Award, label: "Certification", color: "from-pink-500 to-rose-500" },
-  { icon: Star, label: "Talent Profile", color: "from-rose-500 to-orange-500" },
-  { icon: Cloud, label: "WorkCloud Tasks", color: "from-orange-500 to-amber-500" },
-  { icon: ShieldCheck, label: "QA Review", color: "from-amber-500 to-emerald-500" },
-  { icon: Wallet, label: "Earnings Ledger", color: "from-emerald-500 to-teal-500" },
-  { icon: FileBarChart, label: "Reporting", color: "from-teal-500 to-cyan-500" },
+// ---------- Lifecycle Simulator ----------
+const lifecycleSteps = [
+  { step: 1, title: "Demand", icon: Briefcase, role: "Employer / Sponsor", desc: "Employer details their workforce requirements: job category, size, and budget." },
+  { step: 2, title: "Commercial", icon: FileBarChart, role: "Finance Team", desc: "Engine calculates unit costs, wages, and KORVA margins to draft a proposal." },
+  { step: 3, title: "Authorization", icon: UserCheck, role: "Operations Lead", desc: "Demand Coverage Controller (DCC) approves cohort training based on real jobs." },
+  { step: 4, title: "Train", icon: GraduationCap, role: "Learner / LMS", desc: "Recruited candidates undergo intensive 4-week skills training in their field." },
+  { step: 5, title: "Certify", icon: Award, role: "Assessor / Engine", desc: "Candidates pass knowledge, practical, and role-play tests to receive active credentials." },
+  { step: 6, title: "Deploy", icon: Cloud, role: "Worker / Workstream", desc: "Certified specialists are deployed to jobs and start performing daily tasks." },
+  { step: 7, title: "QA Check", icon: ShieldCheck, role: "QA Reviewer", desc: "Reviewers inspect and approve worker deliverables to release payments." },
+  { step: 8, title: "Pay", icon: Wallet, role: "Finance Engine", desc: "Approved tasks automatically trigger mobile money or bank payouts to workers." },
+  { step: 9, title: "Measure", icon: BarChart3, role: "Sponsors / Execs", desc: "Consolidated outcomes (income, retention, ROI) are reported to sponsors." }
 ];
 
 function Lifecycle() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [companyName, setCompanyName] = useState("Afritech Solutions");
+  const [category, setCategory] = useState("Customer Support");
+  const [workersNeeded, setWorkersNeeded] = useState(10);
+  const [budget, setBudget] = useState(45000);
+  const [location, setLocation] = useState("Nigeria 🇳🇬");
+  
+  // Cost calculations
+  const trainingCostPerWorker = 200;
+  const overheadRatio = 0.2;
+  const expectedHours = 480;
+  const workerHourlyWage = 5;
+  
+  const proposedPrice = budget * 0.8; 
+  const workerPayout = workersNeeded * expectedHours * workerHourlyWage;
+  const overheadCost = workerPayout * overheadRatio;
+  const platformMargin = proposedPrice - workerPayout - (workersNeeded * trainingCostPerWorker) - overheadCost;
+
+  // Cohort Plan
+  const [dccRationale, setDccRationale] = useState("High local client demand; signed contract covers 100% of seats.");
+  
+  // Learning
+  const [learningProgress, setLearningProgress] = useState(0);
+  const [isSimulatingLearning, setIsSimulatingLearning] = useState(false);
+
+  // Assessments
+  const [assessmentGraded, setAssessmentGraded] = useState(false);
+
+  // Tasks
+  const [tasksGenerated, setTasksGenerated] = useState(false);
+  const [tasksCompletedCount, setTasksCompletedCount] = useState(0);
+  const [workerTasks, setWorkerTasks] = useState<any[]>([
+    { id: 2844, worker: "John Okafor", type: "Customer Response", score: 94, status: "Pending" },
+    { id: 2845, worker: "Chioma Eze", type: "Billing Correction", score: 78, status: "Pending" },
+    { id: 2846, worker: "Amara Tunde", type: "Technical Support", score: 97, status: "Pending" },
+    { id: 2847, worker: "David Mensah", type: "Account Recovery", score: 91, status: "Pending" },
+  ]);
+
+  // QA
+  const [qaDecisions, setQaDecisions] = useState<{ [key: number]: 'Approved' | 'Rework' }>({});
+  const [qaSubmitted, setQaSubmitted] = useState(false);
+
+  // Pay
+  const [payoutMethod, setPayoutMethod] = useState("MTN Mobile Money");
+  const [payoutStatus, setPayoutStatus] = useState<'Pending' | 'Processing' | 'Completed'>('Pending');
+
+  // Stakeholder view tab
+  const [impactTab, setImpactTab] = useState<'employer' | 'sponsor' | 'exec'>('employer');
+
+  // Simulator controls
+  const handleNextStep = (stepToComplete: number, nextStep: number) => {
+    if (!completedSteps.includes(stepToComplete)) {
+      setCompletedSteps(prev => [...prev, stepToComplete]);
+    }
+    setCurrentStep(nextStep);
+  };
+
+  const handleStepClick = (step: number) => {
+    if (step === 1 || completedSteps.includes(step - 1) || completedSteps.includes(step)) {
+      setCurrentStep(step);
+    }
+  };
+
+  const startLearningSimulation = () => {
+    setIsSimulatingLearning(true);
+    setLearningProgress(0);
+    let current = 0;
+    const interval = setInterval(() => {
+      current += 10;
+      setLearningProgress(current);
+      if (current >= 100) {
+        clearInterval(interval);
+        setIsSimulatingLearning(false);
+      }
+    }, 150);
+  };
+
+  const handleRestart = () => {
+    setCurrentStep(1);
+    setCompletedSteps([]);
+    setCompanyName("Afritech Solutions");
+    setCategory("Customer Support");
+    setWorkersNeeded(10);
+    setBudget(45000);
+    setLocation("Nigeria 🇳🇬");
+    setDccRationale("High local client demand; signed contract covers 100% of seats.");
+    setLearningProgress(0);
+    setAssessmentGraded(false);
+    setTasksGenerated(false);
+    setTasksCompletedCount(0);
+    setWorkerTasks([
+      { id: 2844, worker: "John Okafor", type: "Customer Response", score: 94, status: "Pending" },
+      { id: 2845, worker: "Chioma Eze", type: "Billing Correction", score: 78, status: "Pending" },
+      { id: 2846, worker: "Amara Tunde", type: "Technical Support", score: 97, status: "Pending" },
+      { id: 2847, worker: "David Mensah", type: "Account Recovery", score: 91, status: "Pending" },
+    ]);
+    setQaDecisions({});
+    setQaSubmitted(false);
+    setPayoutStatus('Pending');
+  };
+
+  const activeStepInfo = lifecycleSteps[currentStep - 1];
+
   return (
     <section id="lifecycle" className="border-b border-border/40 bg-secondary/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="Workforce Lifecycle" title="From demand to earnings — one connected flow" desc="Every stage of the workforce journey, orchestrated across a single platform." />
-        <div className="relative">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-1/2 hidden h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-primary/30 to-transparent lg:block"
-          />
-          <div className="relative grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {lifecycle.map((step, i) => (
-              <div
-                key={step.label}
-                className="group relative rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-[var(--shadow-elegant)]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className={`grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${step.color} text-white shadow-md ring-1 ring-white/10`}>
-                    <step.icon className="h-5 w-5" />
-                  </div>
-                  <span className="font-display text-xs font-bold tabular-nums text-muted-foreground/70">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <div className="mt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary/80">
-                  Step {i + 1}
-                </div>
-                <div className="mt-1 font-display text-sm font-semibold leading-snug text-foreground">
-                  {step.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+        <SectionHeader 
+          eyebrow="Interactive Flow Simulator" 
+          title="KORVA™ Demand-First Operating Loop" 
+          desc="Run through a live workforce lifecycle pilot. Experience each stage, from contract entry to payment and reporting." 
+        />
 
-// ---------- Demand Dashboard ----------
-function KpiCard({ icon: Icon, label, value, trend, accent }: { icon: any; label: string; value: string; trend: string; accent: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
-      <div className="flex items-start justify-between">
-        <div className={`grid h-10 w-10 place-items-center rounded-xl ${accent}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-        <span className="rounded-full bg-[color:var(--emerald)]/10 px-2 py-0.5 text-xs font-medium text-[color:var(--emerald)]">{trend}</span>
-      </div>
-      <div className="mt-4 font-display text-3xl font-bold text-foreground">{value}</div>
-      <div className="mt-1 text-sm text-muted-foreground">{label}</div>
-    </div>
-  );
-}
+        {/* 9-Step Horizontal Progress Stepper */}
+        <div className="mb-12 overflow-x-auto py-4">
+          <div className="flex min-w-[900px] items-center justify-between px-4">
+            {lifecycleSteps.map((s, idx) => {
+              const Icon = s.icon;
+              const isCompleted = completedSteps.includes(s.step);
+              const isActive = currentStep === s.step;
+              const isSelectable = s.step === 1 || completedSteps.includes(s.step - 1) || completedSteps.includes(s.step);
 
-const demandCards = [
-  { title: "Solar Technicians", country: "Kenya", qty: 500, status: "Approved", flag: "🇰🇪" },
-  { title: "Healthcare Support Workers", country: "Ghana", qty: 250, status: "Review", flag: "🇬🇭" },
-  { title: "Construction Workers", country: "Nigeria", qty: 800, status: "Approved", flag: "🇳🇬" },
-  { title: "Logistics Operators", country: "South Africa", qty: 320, status: "Approved", flag: "🇿🇦" },
-  { title: "Agritech Field Agents", country: "Rwanda", qty: 180, status: "Review", flag: "🇷🇼" },
-  { title: "Renewable Energy Engineers", country: "Egypt", qty: 410, status: "Approved", flag: "🇪🇬" },
-];
+              return (
+                <div key={s.step} className="relative flex flex-col items-center flex-1">
+                  {/* Connection Line */}
+                  {idx < lifecycleSteps.length - 1 && (
+                    <div 
+                      className={`absolute left-[calc(50%+24px)] right-[calc(-50%+24px)] top-6 h-[2px] transition-colors duration-300 ${
+                        completedSteps.includes(s.step) ? 'bg-primary shadow-[0_0_8px_var(--color-primary)]' : 'bg-white/10'
+                      }`} 
+                    />
+                  )}
 
-function DemandSection() {
-  return (
-    <section id="demand" className="border-b border-border/40 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="Employer Demand" title="Real-time visibility into global workforce demand" desc="Monitor open demands, approvals, capacity, and active deployments in one operational dashboard." />
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <KpiCard icon={Briefcase} label="Open Demands" value="42" trend="+12%" accent="bg-primary/10 text-primary" />
-          <KpiCard icon={CheckCircle2} label="Approved Demands" value="118" trend="+8%" accent="bg-[color:var(--indigo)]/10 text-[color:var(--indigo)]" />
-          <KpiCard icon={Activity} label="Active Projects" value="36" trend="+5%" accent="bg-[color:var(--emerald)]/10 text-[color:var(--emerald)]" />
-          <KpiCard icon={Users} label="Workforce Capacity" value="5,000" trend="+22%" accent="bg-amber-500/10 text-amber-600" />
-        </div>
+                  <button
+                    onClick={() => handleStepClick(s.step)}
+                    disabled={!isSelectable}
+                    className={`relative z-10 grid h-12 w-12 place-items-center rounded-xl border transition-all duration-300 ${
+                      isActive 
+                        ? 'border-primary bg-primary/20 text-primary shadow-[var(--shadow-glow)] scale-110' 
+                        : isCompleted
+                          ? 'border-primary/60 bg-slate-900/80 text-primary hover:border-primary'
+                          : isSelectable
+                            ? 'border-white/20 bg-slate-950/60 text-white/70 hover:border-white/40 hover:text-white'
+                            : 'border-white/5 bg-slate-950/20 text-white/20 cursor-not-allowed'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </button>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {demandCards.map((d) => (
-            <div key={d.title} className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-elegant)]">
-              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[image:var(--gradient-card)] opacity-0 transition-opacity group-hover:opacity-100" />
-              <div className="relative flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5" /> {d.flag} {d.country}
-                  </div>
-                  <h3 className="font-display mt-2 text-lg font-semibold text-foreground">{d.title}</h3>
-                </div>
-                <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${d.status === "Approved" ? "bg-[color:var(--emerald)]/10 text-[color:var(--emerald)]" : "bg-amber-500/10 text-amber-600"}`}>{d.status}</span>
-              </div>
-              <div className="relative mt-5 flex items-end justify-between">
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Quantity</div>
-                  <div className="font-display text-2xl font-bold">{d.qty.toLocaleString()}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Fulfillment</div>
-                  <div className="font-display text-2xl font-bold text-primary">{40 + (d.qty % 50)}%</div>
-                </div>
-              </div>
-              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                <div className="h-full rounded-full bg-[image:var(--gradient-hero)]" style={{ width: `${30 + (d.qty % 60)}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------- Learner Journey ----------
-const journey = [
-  { label: "Profile Created", pct: 100 },
-  { label: "Training Started", pct: 85 },
-  { label: "Assessment Completed", pct: 72 },
-  { label: "Certified", pct: 64 },
-  { label: "Work Ready", pct: 58 },
-];
-
-function LearnerSection() {
-  return (
-    <section id="learner" className="border-b border-border/40 bg-secondary/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="Learner Journey" title="From enrolment to work-ready" desc="A guided experience that turns training milestones into certified, deployable talent." />
-
-        <div className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-soft)]">
-          <div className="grid gap-3 md:grid-cols-5">
-            {journey.map((s, i) => (
-              <div key={s.label} className="relative">
-                <div className="flex items-center gap-3">
-                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[image:var(--gradient-hero)] font-display text-sm font-bold text-white shadow-md">{i + 1}</div>
-                  <div className="text-sm font-medium text-foreground">{s.label}</div>
-                </div>
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
-                  <div className="h-full rounded-full bg-gradient-to-r from-primary to-[color:var(--emerald)] transition-all" style={{ width: `${s.pct}%` }} />
-                </div>
-                <div className="mt-1.5 text-xs text-muted-foreground">{s.pct}% complete</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {[
-              { title: "Solar PV Installation", progress: 78, score: 92, badge: "Certified" },
-              { title: "Healthcare Foundations", progress: 64, score: 88, badge: "In Progress" },
-              { title: "Workplace Safety", progress: 100, score: 95, badge: "Certified" },
-            ].map((c) => (
-              <div key={c.title} className="rounded-2xl border border-border bg-background p-5">
-                <div className="flex items-start justify-between">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary"><GraduationCap className="h-5 w-5" /></div>
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${c.badge === "Certified" ? "bg-[color:var(--emerald)]/10 text-[color:var(--emerald)]" : "bg-primary/10 text-primary"}`}>{c.badge}</span>
-                </div>
-                <h4 className="font-display mt-4 text-base font-semibold">{c.title}</h4>
-                <div className="mt-4 space-y-3 text-sm">
-                  <div>
-                    <div className="flex justify-between text-xs text-muted-foreground"><span>Training</span><span>{c.progress}%</span></div>
-                    <div className="mt-1 h-1.5 rounded-full bg-secondary"><div className="h-full rounded-full bg-primary" style={{ width: `${c.progress}%` }} /></div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs text-muted-foreground"><span>Assessment Score</span><span>{c.score}%</span></div>
-                    <div className="mt-1 h-1.5 rounded-full bg-secondary"><div className="h-full rounded-full bg-[color:var(--emerald)]" style={{ width: `${c.score}%` }} /></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------- Talent Profile ----------
-function TalentSection() {
-  const skills = [
-    { label: "Technical Skills", value: 92 },
-    { label: "Compliance Training", value: 95 },
-    { label: "Work Readiness", value: 89 },
-  ];
-  return (
-    <section id="talent" className="border-b border-border/40 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="Talent Profile" title="A verified profile for every worker" desc="Skills, certifications, and readiness — quantified and ready for deployment." />
-        <div className="grid items-start gap-8 lg:grid-cols-2">
-          <div className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-soft)]">
-            <div className="flex items-start gap-5">
-              <div className="relative">
-                <div className="grid h-20 w-20 place-items-center rounded-2xl bg-[image:var(--gradient-hero)] font-display text-2xl font-bold text-white shadow-[var(--shadow-elegant)]">AO</div>
-                <span className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-card bg-[color:var(--emerald)] text-white"><ShieldCheck className="h-3.5 w-3.5" /></span>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-display text-xl font-bold">Amara Okonkwo</h3>
-                <p className="text-sm text-muted-foreground">Solar PV Technician · Lagos, Nigeria 🇳🇬</p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {["Solar PV", "Electrical", "Safety", "Diagnostics"].map((s) => (
-                    <span key={s} className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">{s}</span>
-                  ))}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground">Readiness</div>
-                <div className="font-display text-3xl font-bold text-[color:var(--emerald)]">92</div>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-4">
-              {skills.map((s) => (
-                <div key={s.label}>
-                  <div className="flex justify-between text-sm"><span className="font-medium">{s.label}</span><span className="text-muted-foreground">{s.value}%</span></div>
-                  <div className="mt-1.5 h-2 rounded-full bg-secondary"><div className="h-full rounded-full bg-[image:var(--gradient-hero)]" style={{ width: `${s.value}%` }} /></div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              {["Solar PV L2", "Safety Cert", "First Aid"].map((c) => (
-                <div key={c} className="rounded-xl border border-border bg-background p-3 text-center">
-                  <Award className="mx-auto h-6 w-6 text-[color:var(--indigo)]" />
-                  <div className="mt-1 text-xs font-medium">{c}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {[
-              { name: "Kwame Asante", role: "Healthcare Support · Accra 🇬🇭", score: 88, skills: ["Patient Care", "First Aid", "Records"] },
-              { name: "Naledi Dlamini", role: "Logistics Operator · Johannesburg 🇿🇦", score: 90, skills: ["Routing", "Fleet", "Safety"] },
-              { name: "Yusuf El-Sayed", role: "Renewable Energy · Cairo 🇪🇬", score: 94, skills: ["Wind", "Solar", "Grid"] },
-            ].map((p) => (
-              <div key={p.name} className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-[image:var(--gradient-hero)] font-display text-sm font-bold text-white">{p.name.split(" ").map(n => n[0]).join("")}</div>
-                <div className="flex-1">
-                  <div className="font-display text-sm font-semibold">{p.name}</div>
-                  <div className="text-xs text-muted-foreground">{p.role}</div>
-                  <div className="mt-1.5 flex flex-wrap gap-1">
-                    {p.skills.map((s) => <span key={s} className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">{s}</span>)}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Score</div>
-                  <div className="font-display text-xl font-bold text-primary">{p.score}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------- WorkCloud Kanban ----------
-const kanban = {
-  Available: { color: "primary", tasks: [
-    { title: "Solar Installation", site: "Nairobi Site B", priority: "High" },
-    { title: "Site Inspection", site: "Lagos Phase 2", priority: "Medium" },
-  ]},
-  Assigned: { color: "indigo", tasks: [
-    { title: "Equipment Setup", site: "Accra Hub", priority: "High" },
-    { title: "Maintenance Review", site: "Cairo Plant", priority: "Low" },
-  ]},
-  Completed: { color: "emerald", tasks: [
-    { title: "Safety Audit", site: "Johannesburg", priority: "Medium" },
-    { title: "Quality Verification", site: "Kigali Field", priority: "High" },
-  ]},
-} as const;
-
-function WorkCloudSection() {
-  return (
-    <section id="workcloud" className="border-b border-border/40 bg-secondary/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="WorkCloud" title="Task management across the field" desc="Allocate, track, and verify work across geographies — Kanban-style, real-time." />
-        <div className="grid gap-6 md:grid-cols-3">
-          {Object.entries(kanban).map(([col, data]) => (
-            <div key={col} className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${col === "Available" ? "bg-primary" : col === "Assigned" ? "bg-[color:var(--indigo)]" : "bg-[color:var(--emerald)]"}`} />
-                  <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-foreground">{col} Tasks</h3>
-                </div>
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground">{data.tasks.length}</span>
-              </div>
-              <div className="mt-4 space-y-3">
-                {data.tasks.map((t) => (
-                  <div key={t.title} className="group rounded-xl border border-border bg-background p-4 transition-all hover:-translate-y-0.5 hover:shadow-md">
-                    <div className="flex items-start justify-between">
-                      <div className="font-medium text-sm">{t.title}</div>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${t.priority === "High" ? "bg-rose-500/10 text-rose-600" : t.priority === "Medium" ? "bg-amber-500/10 text-amber-600" : "bg-[color:var(--emerald)]/10 text-[color:var(--emerald)]"}`}>{t.priority}</span>
+                  <div className="mt-3 text-center">
+                    <div className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                      Step 0{s.step}
                     </div>
-                    <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground"><MapPin className="h-3 w-3" />{t.site}</div>
-                    <div className="mt-3 flex items-center justify-between text-xs">
-                      <div className="flex -space-x-1">
-                        {[1,2,3].map(i => <div key={i} className="grid h-6 w-6 place-items-center rounded-full border-2 border-card bg-[image:var(--gradient-hero)] text-[10px] font-bold text-white">{String.fromCharCode(64+i)}</div>)}
+                    <div className={`mt-0.5 text-xs font-semibold ${isActive ? 'text-white' : 'text-white/50'}`}>
+                      {s.title}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2-Column Working Area */}
+        <div className="grid items-stretch gap-8 lg:grid-cols-12">
+          {/* Left Column: Info & Context */}
+          <div className="flex flex-col justify-between rounded-3xl border border-white/10 bg-slate-950/40 p-8 lg:col-span-5">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                <Workflow className="h-3.5 w-3.5" />
+                Active Actor: {activeStepInfo.role}
+              </div>
+
+              <h3 className="font-display mt-6 text-2xl font-bold text-white">
+                Step {activeStepInfo.step}: {activeStepInfo.title}
+              </h3>
+              
+              <p className="mt-4 text-base leading-relaxed text-white/70">
+                {activeStepInfo.desc}
+              </p>
+
+              {/* Step context detail from md wireframes */}
+              <div className="mt-6 space-y-3 border-t border-white/10 pt-6">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Why this is Demand-First:</h4>
+                <p className="text-xs text-white/60">
+                  {currentStep <= 3 && "We confirm valid jobs, contract value, and deployment margins before any training program is authorized."}
+                  {(currentStep >= 4 && currentStep <= 5) && "We train only target numbers needed to cover the employer's actual vacant slots, preventing resource wastage."}
+                  {currentStep >= 6 && "Workers operate inside WorkCloud workflows. Tasks are directly linked to client work orders and are verified before payout is issued."}
+                </p>
+              </div>
+            </div>
+
+            {/* Inputs / Outputs Panel */}
+            <div className="mt-8 rounded-2xl bg-slate-900/40 p-4 border border-white/5">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-primary/80">Key Outputs Generated</div>
+              <ul className="mt-2.5 space-y-1.5 text-xs text-white/80 list-inside list-disc">
+                {currentStep === 1 && (
+                  <>
+                    <li>Qualified Demand Record</li>
+                    <li>Sponsor profile created</li>
+                    <li>Employer request documented</li>
+                  </>
+                )}
+                {currentStep === 2 && (
+                  <>
+                    <li>Financial Proposal draft</li>
+                    <li>Platform margin: ${Math.round(platformMargin).toLocaleString()}</li>
+                    <li>Pricing terms approved</li>
+                  </>
+                )}
+                {currentStep === 3 && (
+                  <>
+                    <li>Authorized Cohort size: {workersNeeded + 2}</li>
+                    <li>Demand Coverage Ratio: {((workersNeeded) / (workersNeeded + 2)).toFixed(2)}</li>
+                    <li>Operations Gate Approval</li>
+                  </>
+                )}
+                {currentStep === 4 && (
+                  <>
+                    <li>LMS Course Completion profiles</li>
+                    <li>Candidate learning logs</li>
+                    <li>Ready for evaluation state</li>
+                  </>
+                )}
+                {currentStep === 5 && (
+                  <>
+                    <li>Active & deployable certifications</li>
+                    <li>QR verification codes created</li>
+                    <li>Knowledge, Practical & Role-play scores</li>
+                  </>
+                )}
+                {currentStep === 6 && (
+                  <>
+                    <li>Workstream capacity configured</li>
+                    <li>Task queue assigned</li>
+                    <li>Worker deliverables submitted</li>
+                  </>
+                )}
+                {currentStep === 7 && (
+                  <>
+                    <li>QA audit logs</li>
+                    <li>Individual quality scores</li>
+                    <li>Payout eligibility records</li>
+                  </>
+                )}
+                {currentStep === 8 && (
+                  <>
+                    <li>Worker earnings Ledger balances</li>
+                    <li>Orchestrated payment instructions</li>
+                    <li>Mobile money API receipt</li>
+                  </>
+                )}
+                {currentStep === 9 && (
+                  <>
+                    <li>Consolidated Impact Evidence</li>
+                    <li>Employment retention metrics</li>
+                    <li>Employer satisfaction report</li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </div>
+
+          {/* Right Column: Interactive Wireframe Mockup */}
+          <div className="flex flex-col rounded-3xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur-xl lg:col-span-7">
+            {/* Mockup Header bar */}
+            <div className="mb-6 flex items-center justify-between border-b border-white/5 pb-4">
+              <div className="flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full bg-rose-500/80" />
+                <span className="h-3 w-3 rounded-full bg-amber-500/80" />
+                <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
+              </div>
+              <div className="rounded-lg bg-slate-950/60 px-3 py-1 text-[10px] font-mono text-white/50 border border-white/5">
+                {currentStep === 1 && "korva.app/sponsor/demand"}
+                {currentStep === 2 && "korva.app/finance/cost-engine"}
+                {currentStep === 3 && "korva.app/ops/dcc"}
+                {currentStep === 4 && "korva.app/lms/training"}
+                {currentStep === 5 && "korva.app/certification/assessments"}
+                {currentStep === 6 && "korva.app/workcloud/tasks"}
+                {currentStep === 7 && "korva.app/ops/qa-review"}
+                {currentStep === 8 && "korva.app/finance/payouts"}
+                {currentStep === 9 && "korva.app/reports/impact"}
+              </div>
+            </div>
+
+            {/* Mockup Content Panel */}
+            <div className="flex-1">
+              {/* STEP 1: DEMAND REQUEST FORM */}
+              {currentStep === 1 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">🏢 Employer Demand Request</h4>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <label className="block text-xs font-semibold text-white/60">Company / Sponsor Name</label>
+                      <input 
+                        type="text" 
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-white focus:border-primary focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-white/60">Work Category</label>
+                        <select 
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-white focus:border-primary focus:outline-none"
+                        >
+                          <option value="Customer Support">Customer Support</option>
+                          <option value="Data Operations">Data Operations</option>
+                          <option value="Admin Operations">Admin Operations</option>
+                          <option value="Research & Content">Research & Content</option>
+                        </select>
                       </div>
-                      <span className="text-muted-foreground">2d ago</span>
+                      <div>
+                        <label className="block text-xs font-semibold text-white/60">Target Location</label>
+                        <select 
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-white focus:border-primary focus:outline-none"
+                        >
+                          <option value="Nigeria 🇳🇬">Nigeria 🇳🇬</option>
+                          <option value="Ghana 🇬🇭">Ghana 🇬🇭</option>
+                          <option value="Kenya 🇰🇪">Kenya 🇰🇪</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-white/60">Workers Needed</label>
+                        <input 
+                          type="number" 
+                          value={workersNeeded}
+                          onChange={(e) => setWorkersNeeded(Number(e.target.value))}
+                          className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-white focus:border-primary focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-white/60">Total Budget ($)</label>
+                        <input 
+                          type="number" 
+                          value={budget}
+                          onChange={(e) => setBudget(Number(e.target.value))}
+                          className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-white focus:border-primary focus:outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ---------- QA Section ----------
-function QASection() {
-  const steps = [
-    { label: "Submitted", count: 124, icon: ClipboardCheck, color: "bg-primary/10 text-primary" },
-    { label: "Under Review", count: 36, icon: ShieldCheck, color: "bg-amber-500/10 text-amber-600" },
-    { label: "Approved", count: 312, icon: CheckCircle2, color: "bg-[color:var(--emerald)]/10 text-[color:var(--emerald)]" },
-  ];
-  return (
-    <section className="border-b border-border/40 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="QA Workflow" title="Quality assurance built into every deliverable" desc="A structured review pipeline ensures every output meets compliance and quality standards." />
-        <div className="grid gap-6 lg:grid-cols-3">
-          {steps.map((s, i) => (
-            <div key={s.label} className="relative rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
-              <div className={`mb-4 inline-grid h-12 w-12 place-items-center rounded-xl ${s.color}`}><s.icon className="h-6 w-6" /></div>
-              <div className="text-sm text-muted-foreground">{s.label}</div>
-              <div className="font-display mt-1 text-3xl font-bold">{s.count}</div>
-              {i < steps.length - 1 && <div className="absolute -right-3 top-1/2 hidden h-px w-6 bg-border lg:block" />}
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <div className="text-sm text-muted-foreground">Pass Rate</div>
-            <div className="font-display mt-1 text-4xl font-bold text-[color:var(--emerald)]">94.2%</div>
-            <div className="mt-3 h-2 rounded-full bg-secondary"><div className="h-full rounded-full bg-[color:var(--emerald)]" style={{ width: "94%" }} /></div>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <div className="text-sm text-muted-foreground">Review Queue</div>
-            <div className="font-display mt-1 text-4xl font-bold text-primary">36</div>
-            <div className="mt-3 text-xs text-muted-foreground">Avg. resolution time · 1.4 days</div>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <div className="text-sm text-muted-foreground">Compliance Score</div>
-            <div className="font-display mt-1 text-4xl font-bold text-[color:var(--indigo)]">A+</div>
-            <div className="mt-3 text-xs text-muted-foreground">ISO-aligned · audited monthly</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------- Pay Ledger ----------
-function PaySection() {
-  const tx = [
-    { who: "Amara Okonkwo", task: "Solar PV Installation · Nairobi", amount: 320, status: "Completed", date: "Today" },
-    { who: "Kwame Asante", task: "Healthcare Outreach · Accra", amount: 180, status: "Pending", date: "Today" },
-    { who: "Naledi Dlamini", task: "Logistics Route Audit · JHB", amount: 250, status: "Completed", date: "Yesterday" },
-    { who: "Yusuf El-Sayed", task: "Wind Turbine Inspection · Cairo", amount: 410, status: "Pending", date: "Yesterday" },
-    { who: "Chidinma Obi", task: "Site Safety Review · Lagos", amount: 145, status: "Completed", date: "2 days ago" },
-  ];
-  return (
-    <section id="pay" className="border-b border-border/40 bg-secondary/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="KORVA Pay" title="Workforce earnings ledger" desc="A transparent record of earnings, payouts, and transactions across the workforce. Not a banking system — an operational ledger." />
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            { label: "Task Earnings", value: "$750", icon: DollarSign, color: "bg-primary/10 text-primary" },
-            { label: "Pending Payout", value: "$250", icon: Wallet, color: "bg-amber-500/10 text-amber-600" },
-            { label: "Completed Payouts", value: "$500", icon: CheckCircle2, color: "bg-[color:var(--emerald)]/10 text-[color:var(--emerald)]" },
-          ].map((k) => (
-            <div key={k.label} className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
-              <div className={`inline-grid h-10 w-10 place-items-center rounded-xl ${k.color}`}><k.icon className="h-5 w-5" /></div>
-              <div className="mt-4 text-sm text-muted-foreground">{k.label}</div>
-              <div className="font-display mt-1 text-3xl font-bold">{k.value}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)]">
-          <div className="border-b border-border px-6 py-4">
-            <h3 className="font-display text-base font-semibold">Ledger Transactions</h3>
-          </div>
-          <div className="divide-y divide-border">
-            {tx.map((t, i) => (
-              <div key={i} className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-secondary/40">
-                <div className="grid h-10 w-10 place-items-center rounded-full bg-[image:var(--gradient-hero)] text-xs font-bold text-white">{t.who.split(" ").map(n => n[0]).join("")}</div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium">{t.who}</div>
-                  <div className="text-xs text-muted-foreground">{t.task}</div>
-                </div>
-                <div className="hidden text-xs text-muted-foreground md:block">{t.date}</div>
-                <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${t.status === "Completed" ? "bg-[color:var(--emerald)]/10 text-[color:var(--emerald)]" : "bg-amber-500/10 text-amber-600"}`}>{t.status}</span>
-                <div className="w-24 text-right font-display text-base font-bold tabular-nums">${t.amount}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------- Analytics ----------
-function AnalyticsSection() {
-  const grid = (color: string) => ({ color, drawTicks: false });
-  const baseAxis = {
-    grid: { color: "rgba(255,255,255,0.06)", drawTicks: false },
-    ticks: { color: "rgba(255,255,255,0.55)", font: { family: "Inter", size: 11 } },
-    border: { display: false },
-  };
-  const commonOpts: any = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { backgroundColor: "#0a0f1f", padding: 10, cornerRadius: 8, borderColor: "rgba(255,255,255,0.08)", borderWidth: 1 } },
-    scales: { x: baseAxis, y: baseAxis },
-  };
-
-  const lineData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
-    datasets: [{
-      label: "Learners",
-      data: [800, 1200, 1900, 2400, 3100, 3800, 4400, 5000],
-      borderColor: "rgb(94,234,212)",
-      backgroundColor: "rgba(94,234,212,0.18)",
-      tension: 0.4, fill: true, pointBackgroundColor: "#0a0f1f", pointBorderColor: "rgb(94,234,212)", pointBorderWidth: 2, pointRadius: 4,
-    }],
-  };
-
-  const barData = {
-    labels: ["Solar", "Health", "Construct.", "Logistics", "Agri", "Energy"],
-    datasets: [{
-      label: "Certs", data: [220, 180, 310, 140, 95, 305],
-      backgroundColor: "rgba(251,191,36,0.85)", borderRadius: 8, borderSkipped: false,
-    }],
-  };
-
-  const doughnutData = {
-    labels: ["Completed", "In Progress", "Available"],
-    datasets: [{
-      data: [520, 220, 110],
-      backgroundColor: ["rgb(94,234,212)", "rgb(167,139,250)", "rgb(251,191,36)"],
-      borderWidth: 0, hoverOffset: 8,
-    }],
-  };
-
-  const areaData = {
-    labels: ["W1","W2","W3","W4","W5","W6","W7","W8"],
-    datasets: [{
-      label: "Earnings", data: [12,18,24,31,42,55,68,82],
-      borderColor: "rgb(167,139,250)", backgroundColor: "rgba(167,139,250,0.20)",
-      tension: 0.45, fill: true, pointRadius: 0,
-    }],
-  };
-
-  const cards = [
-    { label: "Monthly Active Learners", value: "5,000", trend: "+18%", icon: Users },
-    { label: "Certifications Issued", value: "1,250", trend: "+24%", icon: Award },
-    { label: "Task Completion Rate", value: "92.4%", trend: "+3.2%", icon: Target },
-    { label: "Total Earnings Tracked", value: "$250K", trend: "+31%", icon: TrendingUp },
-  ];
-
-  return (
-    <section id="analytics" className="border-b border-border/40 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="Analytics" title="Operational intelligence at a glance" desc="Real-time KPIs across workforce growth, certifications, task completion, and revenue." />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {cards.map((c) => (
-            <div key={c.label} className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
-              <div className="flex items-center justify-between">
-                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary"><c.icon className="h-4.5 w-4.5" /></div>
-                <span className="rounded-full bg-[color:var(--emerald)]/10 px-2 py-0.5 text-xs font-medium text-[color:var(--emerald)]">{c.trend}</span>
-              </div>
-              <div className="font-display mt-4 text-2xl font-bold">{c.value}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{c.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <ChartCard title="Workforce Growth" subtitle="Cumulative learners onboarded" icon={LineIcon}>
-            <Line data={lineData} options={commonOpts} />
-          </ChartCard>
-          <ChartCard title="Certifications Issued" subtitle="By workforce category" icon={Award}>
-            <Bar data={barData} options={commonOpts} />
-          </ChartCard>
-          <ChartCard title="Task Completion" subtitle="Status distribution" icon={CheckCircle2}>
-            <Doughnut data={doughnutData} options={{ responsive: true, maintainAspectRatio: false, cutout: "65%", plugins: { legend: { position: "bottom" as const, labels: { color: "rgba(255,255,255,0.65)", font: { family: "Inter" } } } } }} />
-          </ChartCard>
-          <ChartCard title="Revenue / Earnings" subtitle="Weekly earnings tracked ($K)" icon={TrendingUp}>
-            <Line data={areaData} options={commonOpts} />
-          </ChartCard>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ChartCard({ title, subtitle, icon: Icon, children }: { title: string; subtitle: string; icon: any; children: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
-      <div className="mb-4 flex items-start justify-between">
-        <div>
-          <h3 className="font-display text-base font-semibold">{title}</h3>
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        </div>
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary"><Icon className="h-4 w-4" /></div>
-      </div>
-      <div className="h-64">{children}</div>
-    </div>
-  );
-}
-
-// ---------- Admin Control Center ----------
-function AdminSection() {
-  const tiles = [
-    { label: "User Management", icon: Users, count: "5,218 users", color: "from-blue-500 to-indigo-500" },
-    { label: "Demand Approvals", icon: CheckCircle2, count: "42 pending", color: "from-indigo-500 to-violet-500" },
-    { label: "Certification Controls", icon: Award, count: "1,250 issued", color: "from-violet-500 to-purple-500" },
-    { label: "Reporting Center", icon: FileBarChart, count: "32 reports", color: "from-emerald-500 to-teal-500" },
-    { label: "System Settings", icon: Settings, count: "All systems OK", color: "from-slate-600 to-slate-800" },
-    { label: "Activity Logs", icon: Activity, count: "Live", color: "from-amber-500 to-orange-500" },
-  ];
-  return (
-    <section id="admin" className="border-b border-border/40 bg-secondary/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHeader eyebrow="Admin Control Center" title="Operate the entire platform from one console" desc="Manage users, approvals, certifications, and reporting from a single command surface." />
-        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-soft)]">
-          <div className="flex items-center justify-between border-b border-border bg-background/60 px-6 py-4">
-            <div className="flex items-center gap-3">
-              <LayoutDashboard className="h-5 w-5 text-primary" />
-              <span className="font-display text-sm font-semibold">Admin Console</span>
-              <span className="rounded-full bg-[color:var(--emerald)]/10 px-2 py-0.5 text-xs font-medium text-[color:var(--emerald)]">● Live</span>
-            </div>
-            <div className="hidden gap-2 md:flex">
-              {["Overview", "Operations", "Compliance", "Finance"].map((t, i) => (
-                <button key={t} className={`rounded-lg px-3 py-1.5 text-xs font-medium ${i === 0 ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"}`}>{t}</button>
-              ))}
-            </div>
-          </div>
-          <div className="grid gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
-            {tiles.map((t) => (
-              <div key={t.label} className="group cursor-pointer rounded-2xl border border-border bg-background p-5 transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-elegant)]">
-                <div className={`mb-4 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${t.color} text-white shadow-md`}>
-                  <t.icon className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-base font-semibold">{t.label}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{t.count}</p>
-                <div className="mt-4 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">Open module →</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------- Architecture ----------
-const arch = [
-  { label: "Employer", icon: Briefcase },
-  { label: "Demand Engine", icon: Target },
-  { label: "Training & Certification", icon: GraduationCap },
-  { label: "Talent Profile", icon: Star },
-  { label: "WorkCloud Tasks", icon: Cloud },
-  { label: "QA Validation", icon: ShieldCheck },
-  { label: "Earnings Ledger", icon: Wallet },
-  { label: "Reporting", icon: BarChart3 },
-];
-
-function ArchitectureSection() {
-  return (
-    <section className="border-b border-border/40 py-24">
-      <div className="mx-auto max-w-5xl px-6">
-        <SectionHeader eyebrow="MVP Architecture" title="How KORVA fits together" desc="A connected stack — from employer demand to reporting — purpose-built for workforce orchestration." />
-        <div className="space-y-3">
-          {arch.map((a, i) => (
-            <div key={a.label}>
-              <div className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-[image:var(--gradient-hero)] text-white shadow-md">
-                  <a.icon className="h-6 w-6" />
-                </div>
-                <div className="flex-1">
-                  <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Layer {String(i + 1).padStart(2, "0")}</div>
-                  <div className="font-display text-lg font-semibold">{a.label}</div>
-                </div>
-                <div className="hidden text-xs text-muted-foreground md:block">Active</div>
-                <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--emerald)] shadow-[0_0_12px_currentColor]" />
-              </div>
-              {i < arch.length - 1 && (
-                <div className="my-1 flex justify-center">
-                  <div className="h-5 w-px bg-gradient-to-b from-border via-primary/40 to-border" />
+                  <div className="pt-4">
+                    <button
+                      onClick={() => handleNextStep(1, 2)}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform hover:scale-[1.02]"
+                    >
+                      Submit Demand Request <Zap className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               )}
+
+              {/* STEP 2: COMMERCIAL APPROVAL */}
+              {currentStep === 2 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">💰 Pricing & Proposal Engine</h4>
+                  <div className="rounded-xl bg-slate-950/40 p-4 border border-white/5 space-y-2.5 text-xs">
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-white/60 font-semibold">Demand Summary:</span>
+                      <span className="text-white font-bold">{workersNeeded} {category} specialists for {companyName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Worker Hourly Wage:</span>
+                      <span className="text-white font-semibold">${workerHourlyWage}/hour</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Total Hours (480 hrs/worker):</span>
+                      <span className="text-white font-semibold">{(workersNeeded * expectedHours).toLocaleString()} hours</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Worker Payout Pool:</span>
+                      <span className="text-white font-semibold">${workerPayout.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Training Costs ($200/head):</span>
+                      <span className="text-white font-semibold">${(workersNeeded * trainingCostPerWorker).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/50">Operating Overhead (20%):</span>
+                      <span className="text-white font-semibold">${overheadCost.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-white/5 pt-2 font-semibold">
+                      <span className="text-primary">Proposed Price (LOI):</span>
+                      <span className="text-primary font-bold">${proposedPrice.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold">
+                      <span className="text-emerald-400">Target KORVA Margin:</span>
+                      <span className="text-emerald-400 font-bold">
+                        ${platformMargin.toLocaleString()} ({Math.round((platformMargin / proposedPrice) * 100)}%)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex gap-3">
+                    <button 
+                      onClick={() => setCurrentStep(1)}
+                      className="flex-1 rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-xs font-semibold text-white/80 hover:bg-slate-950 hover:text-white"
+                    >
+                      Request Changes
+                    </button>
+                    <button
+                      onClick={() => handleNextStep(2, 3)}
+                      className="flex-[2] inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                    >
+                      Approve & Generate Proposal
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 3: COHORT AUTHORIZATION */}
+              {currentStep === 3 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">⚙️ Cohort Authorization Controls</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="rounded-xl border border-white/5 bg-slate-950/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Expected Deployed</div>
+                      <div className="font-display mt-1 text-2xl font-bold text-white">{workersNeeded}</div>
+                    </div>
+                    <div className="rounded-xl border border-white/5 bg-slate-950/40 p-3">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Target Trained</div>
+                      <div className="font-display mt-1 text-2xl font-bold text-white">{workersNeeded + 2}</div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-amber-500">Demand Coverage Ratio (DCR):</span>
+                      <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs font-mono font-bold text-amber-500">
+                        {((workersNeeded) / (workersNeeded + 2)).toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-amber-500/80 leading-relaxed">
+                      DCR is below 1.0 (Cohort training is slightly larger than actual job pool to buffer candidate attrition). Operational justification is required to proceed.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-white/60">Operations Rationale</label>
+                    <textarea 
+                      value={dccRationale}
+                      onChange={(e) => setDccRationale(e.target.value)}
+                      rows={2}
+                      className="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2 text-xs text-white focus:border-primary focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex gap-3">
+                    <button 
+                      onClick={() => handleNextStep(3, 4)}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                    >
+                      Authorize Cohort & Begin Training
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 4: LEARNER ONBOARDING & TRAINING */}
+              {currentStep === 4 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">📱 Learner Course Simulator</h4>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-xs text-white/70">
+                      <span>Cohort Progress:</span>
+                      <span className="font-bold font-mono text-primary">{learningProgress}% Complete</span>
+                    </div>
+                    
+                    <div className="h-3.5 w-full overflow-hidden rounded-full bg-slate-950/80 border border-white/10 p-[2px]">
+                      <div 
+                        className="h-full rounded-full bg-gradient-to-r from-primary to-amber-500 transition-all duration-300"
+                        style={{ width: `${learningProgress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Candidate List Mockup */}
+                  <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4 divide-y divide-white/5 text-xs max-h-[160px] overflow-y-auto">
+                    {[
+                      { name: "John Okafor", module: "Module 3: CRM Basics", p: learningProgress },
+                      { name: "Chioma Eze", module: "Module 3: CRM Basics", p: Math.max(0, learningProgress - 10) },
+                      { name: "Amara Tunde", module: "Module 4: Quality & SLA", p: Math.min(100, learningProgress + 5) },
+                      { name: "David Mensah", module: "Module 2: Communication", p: Math.max(0, learningProgress - 20) }
+                    ].map((c, i) => (
+                      <div key={i} className="flex justify-between py-2 items-center">
+                        <span className="text-white font-medium">{c.name}</span>
+                        <span className="text-white/40">{c.p >= 100 ? "Finished" : c.module}</span>
+                        <span className="font-mono text-primary font-semibold">{c.p >= 100 ? 100 : c.p}%</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2">
+                    {learningProgress < 100 ? (
+                      <button
+                        onClick={startLearningSimulation}
+                        disabled={isSimulatingLearning}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all"
+                      >
+                        {isSimulatingLearning ? "Simulating Course..." : "Run Learning Course Simulation"}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleNextStep(4, 5)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                      >
+                        Onboard Cohort to Assessment Engine
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 5: ASSESSMENT & CERTIFICATION */}
+              {currentStep === 5 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">🎯 KORVA Certify™ Assessment</h4>
+                  
+                  <div className="grid gap-3 text-xs">
+                    <div className="flex justify-between items-center rounded-xl bg-slate-950/40 p-3 border border-white/5">
+                      <div>
+                        <div className="font-semibold text-white">1. Knowledge Test</div>
+                        <div className="text-[10px] text-white/50">20 MCQ Evaluation</div>
+                      </div>
+                      <span className={`rounded-full px-2 py-0.5 ${assessmentGraded ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-white/40'}`}>
+                        {assessmentGraded ? "PASSED (84%)" : "Pending"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center rounded-xl bg-slate-950/40 p-3 border border-white/5">
+                      <div>
+                        <div className="font-semibold text-white">2. Practical Live Scenario</div>
+                        <div className="text-[10px] text-white/50">Ticket resolution sim</div>
+                      </div>
+                      <span className={`rounded-full px-2 py-0.5 ${assessmentGraded ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-white/40'}`}>
+                        {assessmentGraded ? "PASSED (91%)" : "Pending"}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center rounded-xl bg-slate-950/40 p-3 border border-white/5">
+                      <div>
+                        <div className="font-semibold text-white">3. Role-Play Assessment</div>
+                        <div className="text-[10px] text-white/50">Video assessor interview</div>
+                      </div>
+                      <span className={`rounded-full px-2 py-0.5 ${assessmentGraded ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-white/40'}`}>
+                        {assessmentGraded ? "PASSED (88%)" : "Pending"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    {!assessmentGraded ? (
+                      <button
+                        onClick={() => setAssessmentGraded(true)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all"
+                      >
+                        Grade Candidate Assessments
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleNextStep(5, 6)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                      >
+                        Issue QR-Certificates & Deploy to WorkCloud
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 6: WORKCLOUD & DEPLOYMENT */}
+              {currentStep === 6 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">🚀 WorkCloud™ Workstream</h4>
+                  <div className="flex items-center justify-between text-xs text-white/60 bg-slate-950/40 px-4 py-2 border border-white/5 rounded-xl">
+                    <span>Project: {companyName} support</span>
+                    <span>Team Capacity: {workersNeeded} workers</span>
+                  </div>
+
+                  <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4 divide-y divide-white/5 text-xs space-y-2.5">
+                    <div className="flex justify-between items-center text-white/60 font-semibold border-b border-white/5 pb-2">
+                      <span>Worker</span>
+                      <span>Task Queue</span>
+                      <span>Delivery Status</span>
+                    </div>
+                    {[
+                      { name: "John Okafor", tasks: 4, status: tasksGenerated ? "In Progress" : "Idle" },
+                      { name: "Chioma Eze", tasks: 5, status: tasksGenerated ? "In Progress" : "Idle" },
+                      { name: "Amara Tunde", tasks: 3, status: tasksGenerated ? "In Progress" : "Idle" },
+                      { name: "David Mensah", tasks: 4, status: tasksGenerated ? "In Progress" : "Idle" }
+                    ].map((w, idx) => (
+                      <div key={idx} className="flex justify-between py-1.5 items-center">
+                        <span className="text-white font-medium">{w.name}</span>
+                        <span className="font-mono text-primary font-bold">{tasksGenerated ? w.tasks : 0} tasks</span>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] ${tasksGenerated ? 'bg-amber-500/10 text-amber-500' : 'bg-white/5 text-white/40'}`}>
+                          {w.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2">
+                    {!tasksGenerated ? (
+                      <button
+                        onClick={() => setTasksGenerated(true)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary shadow-md transition-all"
+                      >
+                        Generate & Assign Daily Tasks
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleNextStep(6, 7)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                      >
+                        Submit Completed Deliverables for QA Review
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 7: QA REVIEW */}
+              {currentStep === 7 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">🛡️ QA Review Console</h4>
+                  
+                  <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4 divide-y divide-white/5 text-xs space-y-2">
+                    <div className="flex justify-between items-center text-white/60 font-semibold border-b border-white/5 pb-2">
+                      <span>Task #</span>
+                      <span>Worker</span>
+                      <span>Score</span>
+                      <span>QA Decision</span>
+                    </div>
+
+                    {workerTasks.map((t) => (
+                      <div key={t.id} className="flex justify-between py-2 items-center">
+                        <span className="text-white/60 font-mono">#{t.id}</span>
+                        <span className="text-white font-medium">{t.worker}</span>
+                        <span className="font-mono text-primary font-bold">{t.score}/100</span>
+                        
+                        <div className="flex gap-1.5">
+                          <button
+                            onClick={() => setQaDecisions(prev => ({ ...prev, [t.id]: 'Approved' }))}
+                            className={`rounded px-2.5 py-0.5 text-[10px] font-semibold border transition-all ${
+                              qaDecisions[t.id] !== 'Rework'
+                                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' 
+                                : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'
+                            }`}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => setQaDecisions(prev => ({ ...prev, [t.id]: 'Rework' }))}
+                            className={`rounded px-2.5 py-0.5 text-[10px] font-semibold border transition-all ${
+                              qaDecisions[t.id] === 'Rework'
+                                ? 'bg-rose-500/20 text-rose-400 border-rose-500/40' 
+                                : 'bg-transparent text-white/40 border-white/10 hover:border-white/20'
+                            }`}
+                          >
+                            Rework
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={() => handleNextStep(7, 8)}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                    >
+                      Submit Decisions & Authorize Payout Ledger
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 8: EARNINGS & PAYOUTS */}
+              {currentStep === 8 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">💰 Batch Payout Orchestrator</h4>
+                  
+                  <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4 space-y-3 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-white/60">Payout Cohort Size:</span>
+                      <span className="text-white font-bold">{workersNeeded} Specialists</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/60">Total Hours Approved:</span>
+                      <span className="text-white font-semibold">{(workersNeeded * expectedHours).toLocaleString()} hours</span>
+                    </div>
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-white/60">Batch Payout Total:</span>
+                      <span className="text-white font-bold text-primary">${workerPayout.toLocaleString()}</span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-white/60 mb-1">Select Payout Channel</label>
+                      <select 
+                        value={payoutMethod}
+                        onChange={(e) => setPayoutMethod(e.target.value)}
+                        className="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-white focus:border-primary focus:outline-none"
+                      >
+                        <option value="MTN Mobile Money">MTN Mobile Money API</option>
+                        <option value="Airtel Mobile Money">Airtel Money API</option>
+                        <option value="Licensed Partner Bank">Commercial Bank Transfer</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    {payoutStatus === 'Pending' ? (
+                      <button
+                        onClick={() => {
+                          setPayoutStatus('Processing');
+                          setTimeout(() => setPayoutStatus('Completed'), 1500);
+                        }}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-accent)] px-5 py-3 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] hover:scale-[1.02]"
+                      >
+                        Release Batch Payouts via API
+                      </button>
+                    ) : payoutStatus === 'Processing' ? (
+                      <div className="w-full text-center py-3 text-xs font-semibold text-white/50 animate-pulse bg-slate-950/60 border border-white/10 rounded-xl">
+                        Contacting API Provider & Processing Ledger Settlements...
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleNextStep(8, 9)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-xs font-semibold text-slate-950 hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform hover:scale-[1.02]"
+                      >
+                        Payouts Complete. View Final Impact Report
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 9: IMPACT MEASUREMENT */}
+              {currentStep === 9 && (
+                <div className="space-y-4">
+                  <h4 className="font-display text-lg font-bold text-white">📊 Consolidated Pilot Evidence</h4>
+                  
+                  {/* Reporting Tab buttons */}
+                  <div className="flex gap-1 border-b border-white/5 pb-2">
+                    {['employer', 'sponsor', 'exec'].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setImpactTab(tab as any)}
+                        className={`rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all ${
+                          impactTab === tab 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'text-white/60 hover:bg-white/5'
+                        }`}
+                      >
+                        {tab === 'employer' && "🏢 Employer"}
+                        {tab === 'sponsor' && "🏛️ Sponsor"}
+                        {tab === 'exec' && "📈 Executive"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Report Card content */}
+                  <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4 text-xs space-y-2.5">
+                    {impactTab === 'employer' && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Client / Partner Name:</span>
+                          <span className="text-white font-bold">{companyName}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/60 font-semibold">Specialists Deployed:</span>
+                          <span className="text-white font-bold text-primary">{workersNeeded} Workers</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Quality SLA Pass Rate:</span>
+                          <span className="text-emerald-400 font-bold">94.2% (Passed)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Total Deliverables Met:</span>
+                          <span className="text-white font-semibold">223 Completed tickets</span>
+                        </div>
+                        <div className="flex justify-between border-t border-white/5 pt-2 font-semibold">
+                          <span className="text-white/60">Total Cost to Client:</span>
+                          <span className="text-white">${proposedPrice.toLocaleString()}</span>
+                        </div>
+                      </>
+                    )}
+
+                    {impactTab === 'sponsor' && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Enrolled Learners:</span>
+                          <span className="text-white font-bold">{workersNeeded + 2} Enrolled</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/60 font-semibold">Direct Jobs Created:</span>
+                          <span className="text-white font-bold text-primary">{workersNeeded} Employed</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Total Income Generated:</span>
+                          <span className="text-emerald-400 font-bold">${workerPayout.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Employment Retention:</span>
+                          <span className="text-white font-semibold">95% (Q3 2026)</span>
+                        </div>
+                        <div className="flex justify-between border-t border-white/5 pt-2 font-semibold">
+                          <span className="text-white/60">Cost Per Job Outcome:</span>
+                          <span className="text-white">
+                            ${Math.round((workerPayout + (workersNeeded * trainingCostPerWorker) + overheadCost) / workersNeeded).toLocaleString()}
+                          </span>
+                        </div>
+                      </>
+                    )}
+
+                    {impactTab === 'exec' && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Gross Revenue:</span>
+                          <span className="text-white font-bold">${proposedPrice.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold">
+                          <span className="text-white/60">Worker Payout Pool:</span>
+                          <span className="text-white text-rose-400 font-bold">-${workerPayout.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Training & Overhead Expenses:</span>
+                          <span className="text-white/60">-${(overheadCost + (workersNeeded * trainingCostPerWorker)).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-white/5 pt-2 font-semibold">
+                          <span className="text-emerald-400">Net Platform Margin:</span>
+                          <span className="text-emerald-400 font-bold">${platformMargin.toLocaleString()}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={handleRestart}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950/60 border border-white/10 px-5 py-3 text-xs font-semibold text-white hover:bg-slate-950 hover:border-primary transition-all"
+                    >
+                      Restart Operating Loop Simulator
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------- SOW Key Components ----------
+const componentsList = [
+  {
+    name: "KORVA Learn™",
+    purpose: "Prepare workers for specified jobs",
+    does: "Hosts learning content in LMS, tracks completion, provides support",
+    helps: "Workers know exactly what to learn; employers know workers are prepared",
+    measure: "80%+ course completion rate",
+    icon: GraduationCap,
+    color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30 text-blue-400"
+  },
+  {
+    name: "KORVA Certify™",
+    purpose: "Create trusted proof of work readiness",
+    does: "Sets standards, runs assessments, issues credentials",
+    helps: "Employers trust workers are truly qualified (not just trained)",
+    measure: "75%+ certification pass rate with quality assurance",
+    icon: Award,
+    color: "from-indigo-500/20 to-violet-500/20 border-indigo-500/30 text-indigo-400"
+  },
+  {
+    name: "KORVA Talent™",
+    purpose: "Make qualified workers discoverable & deployable",
+    does: "Builds worker profiles with skills, certifications, availability",
+    helps: "Match right workers to right jobs quickly",
+    measure: "90%+ deployment rate of certified workers",
+    icon: Star,
+    color: "from-violet-500/20 to-purple-500/20 border-violet-500/30 text-violet-400"
+  },
+  {
+    name: "KORVA Contract™",
+    purpose: "Convert validated demand into controlled revenue",
+    does: "Captures employer requests, pricing, contracts, work orders",
+    helps: "Clear commercial terms prevent disputes; tracking ensures profitability",
+    measure: "100% of deployments linked to signed contracts",
+    icon: Briefcase,
+    color: "from-purple-500/20 to-pink-500/20 border-purple-500/30 text-purple-400"
+  },
+  {
+    name: "KORVA WorkCloud™",
+    purpose: "Convert contracted work into managed output",
+    does: "Assigns tasks, tracks progress, manages team, controls quality",
+    helps: "Deliverables stay on-time, quality, within budget",
+    measure: "95%+ on-time delivery; 90%+ quality acceptance",
+    icon: Cloud,
+    color: "from-pink-500/20 to-rose-500/20 border-pink-500/30 text-pink-400"
+  },
+  {
+    name: "KORVA Pay™",
+    purpose: "Record & orchestrate payment without being a bank",
+    does: "Tracks earnings, creates payout instructions, sends to licensed providers",
+    helps: "Workers get paid; auditable records; no unlicensed money holding",
+    measure: "99%+ payout success rate; <1% failed transfers",
+    icon: Wallet,
+    color: "from-rose-500/20 to-orange-500/20 border-rose-500/30 text-rose-400"
+  },
+  {
+    name: "KORVA Impact™",
+    purpose: "Evidence employment, income, and program outcomes",
+    does: "Collects data, calculates KPIs, creates dashboards",
+    helps: "Everyone sees proof of what works; data drives decisions",
+    measure: "Real-time reporting; 100% data accuracy",
+    icon: BarChart3,
+    color: "from-orange-500/20 to-amber-500/20 border-orange-500/30 text-orange-400"
+  },
+  {
+    name: "KORVA Governance™",
+    purpose: "Protect institutional integrity & procurement readiness",
+    does: "Manages security, compliance, consent, policies, risk",
+    helps: "Enterprise customers trust KORVA; regulatory compliance",
+    measure: "Zero security breaches; 100% audit compliance",
+    icon: ShieldCheck,
+    color: "from-emerald-500/20 to-teal-500/20 border-emerald-500/30 text-emerald-400"
+  }
+];
+
+function KeyComponents() {
+  return (
+    <section id="components" className="border-b border-border/40 py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <SectionHeader 
+          eyebrow="Key Components" 
+          title="The KORVA™ Product Taxonomy" 
+          desc="KORVA's modular components are designed to coordinate labor supply with verified market demand under strict quality guarantees."
+        />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {componentsList.map((c) => {
+            const Icon = c.icon;
+            return (
+              <div 
+                key={c.name} 
+                className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${c.color} p-6 bg-slate-950/20 shadow-[var(--shadow-soft)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-elegant)] hover:bg-slate-900/40`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-slate-900/60 border border-white/10 group-hover:scale-110 transition-transform duration-300">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-white tracking-wide">{c.name}</h3>
+                </div>
+                <div className="mt-5 space-y-3 text-sm">
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">Purpose:</span>
+                    <p className="text-white/80 mt-0.5">{c.purpose}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">What It Does:</span>
+                    <p className="text-white/70 mt-0.5">{c.does}</p>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Why It Helps:</span>
+                    <p className="text-white/70 mt-0.5">{c.helps}</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/5">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-400">Success Measure:</span>
+                    <p className="text-amber-300/90 font-medium mt-0.5">{c.measure}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------- SOW User Journeys ----------
+const journeys = {
+  employer: {
+    title: "🏢 Employer Journey",
+    desc: "How client companies leverage KORVA to scale support, operations, and technical teams.",
+    steps: [
+      { num: "01", title: "Submit Demand Request", details: "Employer enters specific talent requirements (job type, quantity, budget, target start date)." },
+      { num: "02", title: "Receive Commercial Proposal", details: "KORVA responds with clear pricing, training timeline, and certification/quality guarantees within 48 hours." },
+      { num: "03", title: "Review & Sign SOW", details: "Terms, budget, and Net 30 payment milestones are finalized and approved." },
+      { num: "04", title: "Monitor Cohort Pipeline", details: "Track candidate onboarding, training progress, and certification rates in real-time." },
+      { num: "05", title: "Worker Deployment", details: "Certified specialists start working on assignments directly within the WorkCloud interface." },
+      { num: "06", title: "QA Check & Acceptance", details: "Employer reviews and accepts completed tasks, which triggers worker payout." },
+      { num: "07", title: "Impact & Margin Reports", details: "Sponsor receives reports detailing tasks completed, quality ratings, and outcome ROI." }
+    ]
+  },
+  worker: {
+    title: "👤 Worker Journey",
+    desc: "How local young talent accesses training, certifications, and high-quality income opportunities.",
+    steps: [
+      { num: "01", title: "Discover & Sign Up", details: "Candidates discover sponsored training cohorts and build basic profile (availability, interest)." },
+      { num: "02", title: "4-Week LMS Training", details: "Complete CRM tools, Communication, Workplace safety, and Role-play scenarios." },
+      { num: "03", title: "Skills Assessments", details: "Take knowledge, practical, and live video role-play tests to verify skills." },
+      { num: "04", title: "Receive Certification", details: "Pass the exams to earn a verifiable, QR-coded KORVA Specialist Certification." },
+      { num: "05", title: "WorkCloud Assignment", details: "Get assigned to a customer workstream and receive daily queues of paid tasks." },
+      { num: "06", title: "Deliver & Get QA Approval", details: "Submit task outcomes, get feedback, and receive approval notifications." },
+      { num: "07", title: "Earnings Ledger Payout", details: "Track earnings in real-time and request cash-out to MTN or Airtel Mobile Money." }
+    ]
+  },
+  sponsor: {
+    title: "🏛️ Sponsor/DFI Journey",
+    desc: "How development finance institutions and donors fund youth employment programs at scale.",
+    steps: [
+      { num: "01", title: "Define Program Parameters", details: "Sponsor targets a specific budget (e.g. $100K) and target youth outcome quantity (e.g. 50 jobs)." },
+      { num: "02", title: "Sign Funding Agreement", details: "KORVA coordinates matching demand cohorts. Payment is linked to certified outcomes." },
+      { num: "03", title: "On-demand Cohort Sourcing", details: "Recruitment starts. Dashboard displays candidate enrollment status." },
+      { num: "04", title: "Training Funding Release", details: "Funded training starts ($800 per student) to build certified cohorts." },
+      { num: "05", title: "Employment Outcome Tracking", details: "Sponsors see live count of deployed workers and actual wages earned." },
+      { num: "06", title: "Auditable Reporting", details: "Evidence of jobs created, Lives improved, and program ROI (e.g. 2.7x) is generated." },
+      { num: "07", title: "Year-End Audit", details: "Independent verification of employment data and satisfaction metrics for renewal." }
+    ]
+  }
+};
+
+function UserJourneys() {
+  const [activeTab, setActiveTab] = useState<"employer" | "worker" | "sponsor">("employer");
+  const journeyData = journeys[activeTab];
+
+  return (
+    <section id="journeys" className="border-b border-border/40 py-24 bg-slate-950/20">
+      <div className="mx-auto max-w-5xl px-6">
+        <SectionHeader 
+          eyebrow="User Experience" 
+          title="Target User Journeys" 
+          desc="Follow the step-by-step lifecycle for our core platform stakeholders: Employers, Workers, and Sponsors."
+        />
+        
+        {/* Navigation Tabs */}
+        <div className="flex justify-center gap-2 mb-12">
+          {Object.entries(journeys).map(([key, data]) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key as any)}
+              className={`px-6 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 ${
+                activeTab === key 
+                  ? "border-primary bg-primary/20 text-primary shadow-[var(--shadow-glow)]" 
+                  : "border-white/10 bg-slate-950/40 text-white/60 hover:text-white hover:border-white/20"
+              }`}
+            >
+              {data.title.split(" ")[0]} {data.title.split(" ").slice(1).join(" ")}
+            </button>
+          ))}
+        </div>
+
+        {/* Journey Display */}
+        <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-8 shadow-[var(--shadow-elegant)] backdrop-blur-md">
+          <div className="mb-8">
+            <h3 className="font-display text-2xl font-bold text-white">{journeyData.title}</h3>
+            <p className="text-muted-foreground mt-2">{journeyData.desc}</p>
+          </div>
+
+          {/* Vertical Timeline */}
+          <div className="relative border-l border-white/10 pl-6 ml-4 space-y-8">
+            {journeyData.steps.map((step, idx) => (
+              <div key={idx} className="relative group">
+                {/* Bullet node */}
+                <span className="absolute -left-[35px] top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-slate-950 border border-white/20 text-xs font-bold text-white group-hover:border-primary group-hover:text-primary transition-colors duration-300">
+                  {step.num}
+                </span>
+                
+                {/* Content */}
+                <div className="bg-slate-950/40 border border-white/5 rounded-xl p-4 transition-all duration-300 hover:border-white/15 hover:bg-slate-950/60">
+                  <h4 className="font-display font-semibold text-white text-base">{step.title}</h4>
+                  <p className="text-sm text-white/70 mt-1.5 leading-relaxed">{step.details}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------- SOW Decision Gates ----------
+const decisionGates = [
+  {
+    gate: "A",
+    title: "Brand & Scope Gate",
+    question: "Do we agree on what KORVA is?",
+    owner: "Product Owner",
+    action: "Build P0 scope locked, changes controlled",
+    deliverable: "Product taxonomy & SOW finalized"
+  },
+  {
+    gate: "B",
+    title: "Pilot Demand Gate",
+    question: "Do we have a real employer with real budget?",
+    owner: "Operations Lead",
+    action: "Can start recruiting workers immediately",
+    deliverable: "Confirmed employer LOI & SOW"
+  },
+  {
+    gate: "C",
+    title: "Commercial Model Gate",
+    question: "Can we price this profitably?",
+    owner: "Finance Lead",
+    action: "Financial model is realistic & auditable",
+    deliverable: "Pricing rules, margins & contract model"
+  },
+  {
+    gate: "D",
+    title: "Institutional Trust Gate",
+    question: "Can we operate compliantly?",
+    owner: "Legal/Compliance Lead",
+    action: "No regulatory risks; safeguards in place",
+    deliverable: "Payment boundaries & certification governance"
+  },
+  {
+    gate: "E",
+    title: "Technical Readiness Gate",
+    question: "Can we actually build this?",
+    owner: "Technical Lead",
+    action: "Development sprint 1 can start immediately",
+    deliverable: "Provider selections, data model, prototype"
+  }
+];
+
+function DecisionGates() {
+  const [gatesState, setGatesState] = useState<{ [key: string]: boolean }>({
+    A: true,
+    B: true,
+    C: true,
+    D: true,
+    E: true
+  });
+
+  const toggleGate = (key: string) => {
+    setGatesState(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  return (
+    <section id="gates" className="border-b border-border/40 py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <SectionHeader 
+          eyebrow="Phase 0 Approval" 
+          title="Development Decision Gates" 
+          desc="All 5 gates must be cleared and signed off before P0 Build engineering begins. Click on a gate to toggle authorization status."
+        />
+
+        <div className="grid gap-6 md:grid-cols-5 font-sans">
+          {decisionGates.map((gate) => {
+            const isCleared = gatesState[gate.gate];
+            return (
+              <div 
+                key={gate.gate}
+                onClick={() => toggleGate(gate.gate)}
+                className={`cursor-pointer rounded-2xl border p-5 transition-all duration-300 flex flex-col justify-between h-full ${
+                  isCleared 
+                    ? "border-emerald-500/30 bg-emerald-950/10 shadow-[0_0_15px_rgba(16,185,129,0.05)] hover:border-emerald-500/50" 
+                    : "border-rose-500/20 bg-rose-950/5 opacity-80 hover:border-rose-500/40"
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">GATE {gate.gate}</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                      isCleared ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"
+                    }`}>
+                      {isCleared ? "Passed" : "Locked"}
+                    </span>
+                  </div>
+                  <h3 className="font-display font-bold text-base text-white mb-2">{gate.title}</h3>
+                  <p className="text-xs text-white/70 italic mb-4">"{gate.question}"</p>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-white/5 text-[11px]">
+                  <div>
+                    <span className="font-semibold text-muted-foreground block uppercase">Owner:</span>
+                    <span className="text-white/80">{gate.owner}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-muted-foreground block uppercase">Action if Passed:</span>
+                    <span className="text-white/80">{gate.action}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-muted-foreground block uppercase">Key Deliverable:</span>
+                    <span className="text-primary">{gate.deliverable}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------- SOW Implementation Roadmap ----------
+const roadmapPhases = [
+  {
+    phase: "Phase 0",
+    title: "Definition & Setup",
+    timeline: "Weeks 1-4",
+    status: "Active",
+    tasks: [
+      "Taxonomy definition & gate signs",
+      "Draft UI/UX mockups & wireframes",
+      "Finalize pilot SOW & commercials",
+      "Lock data models & third-party integrations"
+    ]
+  },
+  {
+    phase: "Phase 1",
+    title: "Core Platform MVP",
+    timeline: "Weeks 5-12",
+    status: "Upcoming",
+    tasks: [
+      "Implement LMS & course hosting",
+      "Deploy basic certification engine",
+      "Build worker profile databases",
+      "Integrate basic SMS/WhatsApp bots"
+    ]
+  },
+  {
+    phase: "Phase 2",
+    title: "WorkCloud & Contracts",
+    timeline: "Weeks 13-20",
+    status: "Planned",
+    tasks: [
+      "Deploy WorkCloud task manager",
+      "Launch contract/SOW demand console",
+      "Implement QA review pipeline",
+      "Introduce ledger-based payout workflows"
+    ]
+  },
+  {
+    phase: "Phase 3",
+    title: "DFI Analytics & Launch",
+    timeline: "Weeks 21-26",
+    status: "Planned",
+    tasks: [
+      "Deploy Impact dashboard for sponsors",
+      "Enable Mobile Money cash-out via partners",
+      "Begin first pilot cohort recruitment",
+      "Execute independent third-party audits"
+    ]
+  }
+];
+
+function ImplementationRoadmap() {
+  return (
+    <section id="roadmap" className="border-b border-border/40 bg-secondary/30 py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <SectionHeader 
+          eyebrow="Development Roadmap" 
+          title="Implementation Schedule" 
+          desc="Our 26-week milestone schedule leading to pilot deployment and donor validation."
+        />
+
+        <div className="grid gap-6 md:grid-cols-4">
+          {roadmapPhases.map((phase) => (
+            <div 
+              key={phase.phase} 
+              className="rounded-2xl border border-white/10 bg-slate-900/30 p-6 shadow-[var(--shadow-soft)] hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold text-primary tracking-wider uppercase">{phase.phase}</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                  phase.status === "Active" 
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" 
+                    : phase.status === "Upcoming"
+                    ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/20"
+                    : "bg-white/5 text-white/40 border border-white/5"
+                }`}>
+                  {phase.status}
+                </span>
+              </div>
+              <h3 className="font-display font-bold text-lg text-white">{phase.title}</h3>
+              <span className="text-xs text-muted-foreground mt-1 block">{phase.timeline}</span>
+              
+              <ul className="mt-6 space-y-2.5 text-xs text-white/80">
+                {phase.tasks.map((task, idx) => (
+                  <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>{task}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------- SOW Success Metrics ----------
+function SuccessMetrics() {
+  return (
+    <section id="metrics" className="border-b border-border/40 py-24 bg-slate-950/20">
+      <div className="mx-auto max-w-7xl px-6">
+        <SectionHeader 
+          eyebrow="Verification" 
+          title="Donors & Sponsors Success Metrics" 
+          desc="KORVA tracks these five primary outcome pillars to demonstrate real impact and compliance."
+        />
+
+        <div className="grid gap-6 md:grid-cols-5 font-sans">
+          {[
+            {
+              title: "Verified Jobs Created",
+              target: "10,000+ jobs by Y3",
+              desc: "Individuals deployed on active SOW-supported contracts.",
+              method: "Linked contracts & daily WorkCloud check-ins",
+              pct: 85,
+              color: "text-blue-400"
+            },
+            {
+              title: "Verified Income Generated",
+              target: "$150+ average monthly earnings",
+              desc: "Direct digital payout tracking to workers.",
+              method: "MTN & Airtel mobile money ledger logs",
+              pct: 92,
+              color: "text-indigo-400"
+            },
+            {
+              title: "Enterprise Demand Match",
+              target: "90%+ fulfillment rate",
+              desc: "Fulfilling corporate demand requests.",
+              method: "SOW contract sign-off & cohort size matching",
+              pct: 78,
+              color: "text-violet-400"
+            },
+            {
+              title: "Learner Success",
+              target: "80%+ course completion",
+              desc: "Completion of LMS training material.",
+              method: "KORVA Learn™ system metrics",
+              pct: 90,
+              color: "text-pink-400"
+            },
+            {
+              title: "Employer Satisfaction",
+              target: "90%+ task acceptance",
+              desc: "Quality approval rating by client employers.",
+              method: "Post-task review & QA verification loops",
+              pct: 94,
+              color: "text-emerald-400"
+            }
+          ].map((metric) => (
+            <div 
+              key={metric.title} 
+              className="rounded-2xl border border-white/10 bg-slate-900/30 p-6 shadow-[var(--shadow-soft)] hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm flex flex-col justify-between"
+            >
+              <div>
+                <h3 className="font-display font-bold text-base text-white mb-2">{metric.title}</h3>
+                <span className={`text-sm font-semibold ${metric.color} block mb-3`}>{metric.target}</span>
+                <p className="text-xs text-white/70 leading-relaxed mb-4">{metric.desc}</p>
+              </div>
+
+              <div className="space-y-3 pt-4 border-t border-white/5 text-[11px]">
+                <div>
+                  <span className="font-semibold text-muted-foreground block uppercase">Verification Method:</span>
+                  <span className="text-white/80">{metric.method}</span>
+                </div>
+                <div>
+                  <div className="flex justify-between font-semibold text-muted-foreground uppercase mb-1">
+                    <span>Performance</span>
+                    <span className="text-white">{metric.pct}%</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-slate-950 border border-white/10 overflow-hidden">
+                    <div className="h-full rounded-full bg-[image:var(--gradient-hero)]" style={{ width: `${metric.pct}%` }} />
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -844,15 +1640,11 @@ export function KorvaLanding() {
       <main>
         <Hero />
         <Lifecycle />
-        <DemandSection />
-        <LearnerSection />
-        <TalentSection />
-        <WorkCloudSection />
-        <QASection />
-        <PaySection />
-        <AnalyticsSection />
-        <AdminSection />
-        <ArchitectureSection />
+        <KeyComponents />
+        <UserJourneys />
+        <DecisionGates />
+        <ImplementationRoadmap />
+        <SuccessMetrics />
       </main>
       <Footer />
     </div>
